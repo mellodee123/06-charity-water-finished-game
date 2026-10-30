@@ -8,7 +8,7 @@
     <title>Water Works | charity: water</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
 </head>
@@ -20,10 +20,6 @@
             <span class="brand-game">WATER<br>WORKS</span>
         </a>
         <div class="header-note"><span class="header-spark" aria-hidden="true"></span> CONNECT THE FLOW <span class="header-separator">•</span> CHANGE LIVES</div>
-        <button class="audio-toggle" id="music-toggle" type="button" aria-pressed="true" aria-label="Turn background music off">
-            <span class="audio-toggle-icon" aria-hidden="true">♫</span>
-            <span id="music-state">MUSIC ON</span>
-        </button>
     </header>
 
     <main class="page-shell">
@@ -51,11 +47,18 @@
                             <span class="timer-icon" aria-hidden="true"></span>
                             <span id="timer-value">60</span><span class="timer-unit">SEC</span>
                         </div>
+                        <button class="audio-toggle" id="music-toggle" type="button" aria-pressed="true" aria-label="Turn background music off" aria-keyshortcuts="M">
+                            <span class="audio-toggle-icon" aria-hidden="true">♫</span>
+                            <span id="music-state">MUSIC ON</span> <kbd>M</kbd>
+                        </button>
                         <button class="button button-release" id="release-button" type="button" aria-keyshortcuts="Space Enter">
                             RELEASE WATER <kbd>SPACE</kbd>
                         </button>
-                        <button class="button button-next" id="next-button" type="button" aria-keyshortcuts="N" hidden>
-                            <span id="next-button-label">NEXT LEVEL</span> <kbd>N</kbd>
+                        <button class="button button-reset" id="reset-button" type="button" aria-label="Restart this level" aria-keyshortcuts="N">
+                            <span aria-hidden="true">↻</span> RESET <kbd>N</kbd>
+                        </button>
+                        <button class="button button-next" id="next-button" type="button" aria-keyshortcuts="Space" hidden>
+                            <span id="next-button-label">NEXT LEVEL</span> <kbd>SPACE</kbd>
                         </button>
                     </div>
                 </div>
@@ -63,47 +66,70 @@
                 <div class="timer-track" aria-hidden="true"><span id="timer-bar"></span></div>
 
                 <div class="board-wrap">
+                    <div class="difficulty-row" role="group" aria-label="Difficulty mode">
+                        <span class="difficulty-label">MODE</span>
+                        <button class="difficulty-button" type="button" data-difficulty="easy" aria-pressed="false">EASY</button>
+                        <button class="difficulty-button" type="button" data-difficulty="normal" aria-pressed="true">NORMAL</button>
+                        <button class="difficulty-button" type="button" data-difficulty="hard" aria-pressed="false">HARD</button>
+                    </div>
                     <div class="board-caption">
                         <span id="field-label">LEVEL 01 / 03</span>
                         <span class="best-time-display" aria-label="Best time for this level">
                             BEST <strong id="best-time">--:--</strong>
                         </span>
                     </div>
+                    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
                     <div class="board-instruction">Tap pipes to rotate. Connect the water!</div>
-                    <div class="pollution-hint" id="pollution-hint" hidden>Pollution follows your turns in 2s, then shifts every 5s</div>
-                    <div class="board-stage" id="board-stage">
-                        <div class="endpoint-rail source-rail">
-                            <span class="endpoint-marker source-marker" id="source-marker" role="img" aria-label="Water source, start of the route">
-                                <span class="endpoint-icon source-endpoint-icon" aria-hidden="true"></span>
-                            </span>
+                    <div class="board-instruction">Keyboard: WASD to move, Enter or E to turn, Space to release or go to the next level, N to reset, M for music.</div>
+                    <div class="board-instruction goal-text">Goal: have <strong id="goal-value">250</strong> L to release water</div>
+                    <div class="pollution-hint" id="pollution-hint" hidden>Pollution starts on the far side and creeps one square at a time toward the pipe you turn, then locks it. Polluted pipes dirty your water, so turn them to clean them.</div>
+                    <div class="flow-warning" id="flow-warning" role="alert" hidden>
+                        <strong>⚠ WARNING!</strong>
+                        <span id="flow-warning-text"></span>
+                    </div>
+                    <div class="board-row">
+                        <div class="board-main">
+                        <div class="board-stage" id="board-stage">
+                            <div class="endpoint-rail source-rail">
+                                <span class="endpoint-marker source-marker" id="source-marker" role="img" aria-label="Water source, start of the route">
+                                    <span class="endpoint-icon source-endpoint-icon" aria-hidden="true"></span>
+                                </span>
+                            </div>
+                            <div class="board" id="game-board" role="group" aria-label="Pipe puzzle board"></div>
+                            <div class="endpoint-rail destination-rail">
+                                <span class="endpoint-marker destination-marker" id="destination-marker" role="img" aria-label="Community water tank, route destination">
+                                    <span class="endpoint-icon community-endpoint-icon" aria-hidden="true"><span></span></span>
+                                </span>
+                            </div>
                         </div>
-                        <div class="board" id="game-board" role="group" aria-label="Pipe puzzle board"></div>
-                        <div class="endpoint-rail destination-rail">
-                            <span class="endpoint-marker destination-marker" id="destination-marker" role="img" aria-label="Community water tank, route destination">
-                                <span class="endpoint-icon community-endpoint-icon" aria-hidden="true"><span></span></span>
-                            </span>
+                        <div class="board-legend" aria-hidden="true">
+                            <span><i class="legend-dot source-dot"></i> WATER SOURCE</span>
+                            <span>COMMUNITY <span class="legend-arrow">→</span></span>
+                        </div>
+                        </div>
+                    <div class="powerups-side">
+                        <div class="cleanup-row">
+                            <span class="cleanup-label"><span>PICK UP CANS</span><strong id="cleanup-can-count">03 LEFT</strong></span>
+                            <div class="cleanup-cans" id="cleanup-cans" role="group" aria-label="Collect cans for water points">
+                                <button class="cleanup-can" type="button" data-can-index="0" aria-label="Collect can for 50 water points">
+                                    <span class="can-icon" aria-hidden="true"><span></span></span>
+                                    <span>+50 L</span>
+                                </button>
+                                <button class="cleanup-can" type="button" data-can-index="1" aria-label="Collect can for 50 water points">
+                                    <span class="can-icon" aria-hidden="true"><span></span></span>
+                                    <span>+50 L</span>
+                                </button>
+                                <button class="cleanup-can" type="button" data-can-index="2" aria-label="Collect can for 50 water points">
+                                    <span class="can-icon" aria-hidden="true"><span></span></span>
+                                    <span>+50 L</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="cleanup-row">
+                            <span class="cleanup-label"><span>REPAIR KIT</span><strong id="powerup-count">1 READY</strong></span>
+                            <div class="cleanup-cans" id="powerup-kits" role="group" aria-label="Repair kits that clean and fix all pipes"></div>
                         </div>
                     </div>
-                    <div class="board-legend" aria-hidden="true">
-                        <span><i class="legend-dot source-dot"></i> WATER SOURCE</span>
-                        <span>COMMUNITY <span class="legend-arrow">→</span></span>
-                    </div>
-                    <div class="cleanup-row">
-                        <span class="cleanup-label"><span>PICK UP CANS</span><strong id="cleanup-can-count">03 LEFT</strong></span>
-                        <div class="cleanup-cans" role="group" aria-label="Collect cans for water points">
-                            <button class="cleanup-can" type="button" data-can-index="0" aria-label="Collect can for 50 water points">
-                                <span class="can-icon" aria-hidden="true"><span></span></span>
-                                <span>+50 L</span>
-                            </button>
-                            <button class="cleanup-can" type="button" data-can-index="1" aria-label="Collect can for 50 water points">
-                                <span class="can-icon" aria-hidden="true"><span></span></span>
-                                <span>+50 L</span>
-                            </button>
-                            <button class="cleanup-can" type="button" data-can-index="2" aria-label="Collect can for 50 water points">
-                                <span class="can-icon" aria-hidden="true"><span></span></span>
-                                <span>+50 L</span>
-                            </button>
-                        </div>
                     </div>
                 </div>
 
@@ -111,11 +137,6 @@
                     <div class="game-status" id="game-status" role="status" aria-live="polite">
                         <span class="status-light" aria-hidden="true"></span>
                         <span id="status-message">The water is waiting.</span>
-                    </div>
-                    <div class="control-buttons">
-                        <button class="button button-reset" id="reset-button" type="button" aria-label="Restart the game and restore the score">
-                            <span aria-hidden="true">↻</span> RESET
-                        </button>
                     </div>
                 </div>
             </div>
@@ -145,18 +166,37 @@
                     <p>Three fields. One shared goal.</p>
                 </div>
                 <div class="side-footer"><span class="footer-rule"></span> WATER IS A HUMAN RIGHT</div>
-                <div class="mobile-impact-note">
-                    <strong>Water changes everything.</strong>
-                    <span>Inspired by charity: water <span aria-hidden="true">•</span> <a href="https://www.charitywater.org/">Learn more ↗</a></span>
-                </div>
+                <a class="impact-card" href="https://www.charitywater.org/" target="_blank" rel="noopener">
+                    <img class="impact-image" src="img/water-can-transparent.png" alt="">
+                    <span class="impact-text">
+                        <img class="impact-logo" src="img/cw_logo_horizontal.png" alt="charity: water">
+                        <strong>Water changes everything.</strong>
+                        <span class="impact-link">Learn more ↗</span>
+                    </span>
+                </a>
             </aside>
         </section>
 
         <footer class="page-footer">
             <span>WATER WORKS <span class="footer-dot">/</span> A CHARITY: WATER GAME</span>
-            <span>100% OF PUBLIC DONATIONS FUND CLEAN WATER</span>
+            <nav class="footer-links" aria-label="charity: water links">
+                <span>100% OF PUBLIC DONATIONS FUND CLEAN WATER</span>
+                <a href="https://www.charitywater.org/" target="_blank" rel="noopener">charitywater.org</a>
+                <a class="donate-link" href="https://www.charitywater.org/donate" target="_blank" rel="noopener">DONATE</a>
+            </nav>
         </footer>
     </main>
+
+    <dialog class="record-dialog game-over-dialog" id="game-over-dialog" aria-labelledby="game-over-title">
+        <span class="record-dialog-mark game-over-mark" aria-hidden="true">⏱</span>
+        <p class="eyebrow" id="game-over-level">LEVEL 01</p>
+        <h2 id="game-over-title">Game over</h2>
+        <p class="record-dialog-time">Time ran out before the water got through.</p>
+        <div class="game-over-actions">
+            <button class="button button-release" id="restart-level-button" type="button">RESTART LEVEL</button>
+            <button class="button button-reset" id="restart-game-button" type="button">RESTART GAME</button>
+        </div>
+    </dialog>
 
     <dialog class="record-dialog" id="record-dialog" aria-labelledby="record-dialog-title">
         <span class="record-dialog-mark" aria-hidden="true">★</span>
