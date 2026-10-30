@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f8f4">
+    <meta name="description" content="Turn the pipes and bring clean water to the village in Water Works.">
+    <title>Water Works | charity: water</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="./" aria-label="Water Works home">
+            <img src="img/cw_logo_horizontal.png" alt="charity: water">
+            <span class="brand-divider" aria-hidden="true"></span>
+            <span class="brand-game">WATER<br>WORKS</span>
+        </a>
+        <div class="header-note"><span class="header-spark" aria-hidden="true"></span> CONNECT THE FLOW <span class="header-separator">•</span> CHANGE LIVES</div>
+        <button class="audio-toggle" id="music-toggle" type="button" aria-pressed="true" aria-label="Turn background music off">
+            <span class="audio-toggle-icon" aria-hidden="true">♫</span>
+            <span id="music-state">MUSIC ON</span>
+        </button>
+    </header>
+
+    <main class="page-shell">
+        <section class="game-intro" aria-labelledby="game-title">
+            <div>
+                <p class="eyebrow">WATER WORKS</p>
+                <h1 id="game-title">Connect the flow<span>.</span></h1>
+            </div>
+            <p class="intro-note">Rotate pipes. Deliver water. Discover the impact.</p>
+        </section>
+
+        <section class="game-layout" aria-label="Water Works pipe puzzle">
+            <div class="puzzle-panel">
+                <div class="puzzle-topline">
+                    <div class="level-label"><span class="level-kicker">PUZZLE</span><span id="level-number">01</span></div>
+                    <div class="level-progress" id="level-progress" aria-label="Level progress"></div>
+                    <div class="top-actions">
+                        <div class="score-display" aria-label="Water score in liters">
+                            <span>SCORE</span>
+                            <strong id="score-value">0300</strong>
+                            <span class="score-unit">L</span>
+                            <span class="score-bonus" id="score-bonus" aria-hidden="true"></span>
+                        </div>
+                        <div class="timer" id="timer" aria-label="Time remaining">
+                            <span class="timer-icon" aria-hidden="true"></span>
+                            <span id="timer-value">60</span><span class="timer-unit">SEC</span>
+                        </div>
+                        <button class="button button-release" id="release-button" type="button" aria-keyshortcuts="Space Enter">
+                            RELEASE WATER <kbd>SPACE</kbd>
+                        </button>
+                        <button class="button button-next" id="next-button" type="button" aria-keyshortcuts="N" hidden>
+                            <span id="next-button-label">NEXT LEVEL</span> <kbd>N</kbd>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="timer-track" aria-hidden="true"><span id="timer-bar"></span></div>
+
+                <div class="board-wrap">
+                    <div class="board-caption">
+                        <span id="field-label">LEVEL 01 / 03</span>
+                        <span class="best-time-display" aria-label="Best time for this level">
+                            BEST <strong id="best-time">--:--</strong>
+                        </span>
+                    </div>
+                    <div class="board-instruction">Tap pipes to rotate. Connect the water!</div>
+                    <div class="pollution-hint" id="pollution-hint" hidden>Pollution follows your turns in 2s, then shifts every 5s</div>
+                    <div class="board-stage" id="board-stage">
+                        <div class="endpoint-rail source-rail">
+                            <span class="endpoint-marker source-marker" id="source-marker" role="img" aria-label="Water source, start of the route">
+                                <span class="endpoint-icon source-endpoint-icon" aria-hidden="true"></span>
+                            </span>
+                        </div>
+                        <div class="board" id="game-board" role="group" aria-label="Pipe puzzle board"></div>
+                        <div class="endpoint-rail destination-rail">
+                            <span class="endpoint-marker destination-marker" id="destination-marker" role="img" aria-label="Community water tank, route destination">
+                                <span class="endpoint-icon community-endpoint-icon" aria-hidden="true"><span></span></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="board-legend" aria-hidden="true">
+                        <span><i class="legend-dot source-dot"></i> WATER SOURCE</span>
+                        <span>COMMUNITY <span class="legend-arrow">→</span></span>
+                    </div>
+                    <div class="cleanup-row">
+                        <span class="cleanup-label"><span>PICK UP CANS</span><strong id="cleanup-can-count">03 LEFT</strong></span>
+                        <div class="cleanup-cans" role="group" aria-label="Collect cans for water points">
+                            <button class="cleanup-can" type="button" data-can-index="0" aria-label="Collect can for 50 water points">
+                                <span class="can-icon" aria-hidden="true"><span></span></span>
+                                <span>+50 L</span>
+                            </button>
+                            <button class="cleanup-can" type="button" data-can-index="1" aria-label="Collect can for 50 water points">
+                                <span class="can-icon" aria-hidden="true"><span></span></span>
+                                <span>+50 L</span>
+                            </button>
+                            <button class="cleanup-can" type="button" data-can-index="2" aria-label="Collect can for 50 water points">
+                                <span class="can-icon" aria-hidden="true"><span></span></span>
+                                <span>+50 L</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-controls">
+                    <div class="game-status" id="game-status" role="status" aria-live="polite">
+                        <span class="status-light" aria-hidden="true"></span>
+                        <span id="status-message">The water is waiting.</span>
+                    </div>
+                    <div class="control-buttons">
+                        <button class="button button-reset" id="reset-button" type="button" aria-label="Restart the game and restore the score">
+                            <span aria-hidden="true">↻</span> RESET
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="side-panel" aria-label="Puzzle details">
+                <div class="side-heading">
+                    <span class="section-mark" aria-hidden="true">01</span>
+                    <div>
+                        <p class="eyebrow">YOUR MISSION</p>
+                        <h2>Turn on the tap.</h2>
+                    </div>
+                </div>
+                <p class="side-copy">Rotate the pipes until water has a clear route from the source to the village well.</p>
+
+                <div class="mission-illustration" aria-hidden="true">
+                    <div class="sun-mark"></div>
+                    <div class="illustration-ground"></div>
+                    <div class="illustration-pipe illustration-pipe-one"></div>
+                    <div class="illustration-pipe illustration-pipe-two"></div>
+                    <div class="illustration-well"><span></span></div>
+                    <div class="illustration-drop"></div>
+                    <div class="illustration-label">A LITTLE TURN.<br>A BIG DIFFERENCE.</div>
+                </div>
+
+                <div class="fact-row">
+                    <span class="fact-number">01—03</span>
+                    <p>Three fields. One shared goal.</p>
+                </div>
+                <div class="side-footer"><span class="footer-rule"></span> WATER IS A HUMAN RIGHT</div>
+                <div class="mobile-impact-note">
+                    <strong>Water changes everything.</strong>
+                    <span>Inspired by charity: water <span aria-hidden="true">•</span> <a href="https://www.charitywater.org/">Learn more ↗</a></span>
+                </div>
+            </aside>
+        </section>
+
+        <footer class="page-footer">
+            <span>WATER WORKS <span class="footer-dot">/</span> A CHARITY: WATER GAME</span>
+            <span>100% OF PUBLIC DONATIONS FUND CLEAN WATER</span>
+        </footer>
+    </main>
+
+    <dialog class="record-dialog" id="record-dialog" aria-labelledby="record-dialog-title">
+        <span class="record-dialog-mark" aria-hidden="true">★</span>
+        <p class="eyebrow" id="record-dialog-level">LEVEL 01</p>
+        <h2 id="record-dialog-title">New personal best!</h2>
+        <p class="record-dialog-time">Your time <strong id="record-dialog-time">00:00</strong></p>
+        <p class="record-dialog-previous" id="record-dialog-previous">First record for this level!</p>
+        <form method="dialog">
+            <button class="button button-release" type="submit">CONTINUE</button>
+        </form>
+    </dialog>
+</body>
+</html>
